@@ -1,4 +1,4 @@
-﻿# Enhanced Mech Customization - E.M.C.
+﻿# Pilot Consumable Mod - P.C.M
 
 ![Mod Version](https://img.shields.io/badge/Mod%20Version-v1.0.0-blue)
 ![Game Version](https://img.shields.io/badge/Phantom%20Brigade-%3E%3D%20v2.0-green)
