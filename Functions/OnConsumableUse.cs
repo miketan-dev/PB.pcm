@@ -9,6 +9,10 @@ namespace PB.pcm.Functions
     [TypeHintedPrefix("pcm.functions")]
     public sealed class OnConsumableUseCombat : ICombatActionExecutionFunction
     {
+        private const string HealingKey = "healing";
+        private const string HealingEfficiencyKey = "healing_efficiency";
+        private const string HealConsumableKeyFragment = "consumable_heal";
+
         public void Run(CombatEntity unitCombat, ActionEntity action)
         {
             if (unitCombat == null)
@@ -17,10 +21,17 @@ namespace PB.pcm.Functions
                 return;
             }
 
-            var pilot = IDUtility.GetLinkedPersistentEntity(unitCombat);
+            var unitPersistent = IDUtility.GetLinkedPersistentEntity(unitCombat);
+            if (unitPersistent == null)
+            {
+                Debug.Log("[PCM] - PersistentEntity dell'unità non trovata.");
+                return;
+            }
+
+            var pilot = IDUtility.GetLinkedPilot(unitPersistent);
             if (pilot == null)
             {
-                Debug.Log("[PCM] - Pilota non trovato.");
+                Debug.Log($"[PCM] - Pilota non trovato per unità persistent: {IDUtility.ToLog(unitPersistent)}");
                 return;
             }
 
@@ -37,33 +48,111 @@ namespace PB.pcm.Functions
                 return;
             }
 
-            if (!consumablePart.hasDataLinkSubsystem)
-            {
-                Debug.Log($"[PCM] - Part consumabile {consumablePart.nameInternal.s} non ha un DataLinkSubsystem.");
-                return;
-            }
-
-            var consumableBlueprint = consumablePart.dataLinkSubsystem.data;
+            var consumableBlueprint = GetConsumableSubsystemBlueprint(consumablePart);
             if (consumableBlueprint == null)
             {
-                Debug.Log("[PCM] - Consumable blueprint non trovato.");
+                Debug.Log(
+                    $"[PCM] - Subsystem blueprint consumabile non trovato per la parte: {IDUtility.ToLog(consumablePart)}");
                 return;
             }
 
-            var hp = DataHelperStats.GetCachedStatForPart("hp", consumablePart);
             var charge = DataHelperStats.GetCachedStatForPart("act_charges", consumablePart);
 
-            consumableBlueprint.TryGetFloat("healing_efficiency", out var efficiency, 1f);
+            consumableBlueprint.TryGetFloat(HealingEfficiencyKey, out var efficiency);
+            consumableBlueprint.TryGetFloat(HealingKey, out var healing);
 
-            var totalHeal = hp * efficiency;
-            pilot.OffsetPilotStat("hp", totalHeal);
+            float currentHp = pilot.GetPilotStat("hp");
+            float maxHp = pilot.GetPilotStatMax("hp");
+
+            if (currentHp > 0 && currentHp < maxHp)
+            {
+                float availableSpace = maxHp - currentHp;
+                var totalHeal = healing * efficiency;
+                float finalHeal = Mathf.Min(totalHeal, availableSpace);
+
+                PilotUtility.OffsetPilotStat(pilot, "hp", finalHeal, false);
+                Debug.Log($"[PCM] - HP: {healing} - Curato con successo di: {totalHeal}");
+            }
 
             if (charge <= 0f && !consumablePart.isDestroyed)
             {
                 consumablePart.Destroy();
+                Debug.Log($"[PCM] - Consumabile: {IDUtility.ToLog(consumablePart)} - Distrutto");
             }
 
-            Debug.Log($"[PCM] - HP: {hp} - Curato con successo di: {totalHeal}");
+            Debug.Log($"[PCM] - Cura effettuata con successo.");
+        }
+
+        private static DataContainerSubsystem GetConsumableSubsystemBlueprint(EquipmentEntity part)
+        {
+            if (part == null)
+            {
+                return null;
+            }
+
+            var primaryBlueprint = GetPrimaryActivationSubsystemBlueprint(part);
+            if (primaryBlueprint != null)
+            {
+                return primaryBlueprint;
+            }
+
+            var subsystemBlueprints = EquipmentUtility.GetSubsystemBlueprintsInPart(part);
+            if (subsystemBlueprints == null || subsystemBlueprints.Count == 0)
+            {
+                EquipmentUtility.RefreshPartSubsystemLookup(part);
+                subsystemBlueprints = EquipmentUtility.GetSubsystemBlueprintsInPart(part);
+            }
+
+            if (subsystemBlueprints == null || subsystemBlueprints.Count == 0)
+            {
+                return null;
+            }
+
+            foreach (var subsystemBlueprint in subsystemBlueprints)
+            {
+                if (subsystemBlueprint == null)
+                {
+                    continue;
+                }
+
+                if (subsystemBlueprint.TryGetFloat(HealingEfficiencyKey, out _, 1f))
+                {
+                    return subsystemBlueprint;
+                }
+
+                if (subsystemBlueprint.TryGetFloat(HealingKey, out _, 1f))
+                {
+                    return subsystemBlueprint;
+                }
+            }
+
+            foreach (var subsystemBlueprint in subsystemBlueprints)
+            {
+                if (subsystemBlueprint != null
+                    && subsystemBlueprint.key != null
+                    && subsystemBlueprint.key.Contains(HealConsumableKeyFragment))
+                {
+                    return subsystemBlueprint;
+                }
+            }
+
+            return subsystemBlueprints.Count == 1 ? subsystemBlueprints[0] : null;
+        }
+
+        private static DataContainerSubsystem GetPrimaryActivationSubsystemBlueprint(EquipmentEntity part)
+        {
+            if (part == null || !part.hasPrimaryActivationSubsystem)
+            {
+                return null;
+            }
+
+            var subsystem = IDUtility.GetEquipmentEntity(part.primaryActivationSubsystem.equipmentID);
+            if (subsystem == null || !subsystem.hasDataLinkSubsystem)
+            {
+                return null;
+            }
+
+            return subsystem.dataLinkSubsystem.data;
         }
     }
 }
