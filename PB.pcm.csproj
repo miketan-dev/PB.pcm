@@ -63,6 +63,8 @@
     <ItemGroup>
       <Content Include="Functions\OnConsumableUse_heal_README_IT.md" />
       <Content Include="Functions\OnConsumableUse_heal_README.md" />
+      <Content Include="LICENSE.md" />
+      <Content Include="README.md" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
