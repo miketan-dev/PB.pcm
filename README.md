@@ -64,7 +64,7 @@ This mod extends the game's mechanics, allowing for new tactical possibilities s
 ## Key Features
 
 * **Consumable Usage:** Enables the use of specific consumable items during combat actions.
-* **Healing System:** Integrated logic to allow items to repair pilot/unit health.
+* **Healing System:** Integrated logic to allow items to healing the pilot during combat.
 * **Customizable:** Fully configurable through YAML, allowing modders to define base healing values and efficiency coefficients per item.
 * **Smart Resource Management:** Automatically consumes charges and destroys the item once all charges are depleted.
 
