@@ -2,7 +2,7 @@
 using PhantomBrigade;
 using PhantomBrigade.Data;
 
-namespace PB.pcm.Utils
+namespace PB.pcm.Helpers
 {
     internal static class SubsystemHelper
     {
