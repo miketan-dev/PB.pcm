@@ -32,39 +32,41 @@
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
+    <PropertyGroup>
+        <SteamInstallationPath>Z:\SteamLibrary\steamapps\common\Phantom Brigade</SteamInstallationPath>
+        <ReferencePath>$(SteamInstallationPath)\PhantomBrigade_Data\Managed;</ReferencePath>
+    </PropertyGroup>
     <ItemGroup>
-        <Compile Include="Functions\OnConsumableUse.cs" />
-        <Compile Include="PcmModLink.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Reference Include="0Harmony">
-        <HintPath>Z:\Steam Launcher\steamapps\common\Phantom Brigade\PhantomBrigade_Data\Managed\0Harmony.dll</HintPath>
-      </Reference>
-      <Reference Include="Assembly-CSharp">
-        <HintPath>Z:\Steam Launcher\steamapps\common\Phantom Brigade\PhantomBrigade_Data\Managed\Assembly-CSharp.dll</HintPath>
-      </Reference>
-      <Reference Include="Assembly-CSharp-firstpass">
-        <HintPath>Z:\Steam Launcher\steamapps\common\Phantom Brigade\PhantomBrigade_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-      </Reference>
-      <Reference Include="Entitas">
-        <HintPath>Z:\Steam Launcher\steamapps\common\Phantom Brigade\PhantomBrigade_Data\Managed\Entitas.dll</HintPath>
-      </Reference>
-      <Reference Include="System">
-        <HintPath>Z:\Steam Launcher\steamapps\common\Phantom Brigade\PhantomBrigade_Data\Managed\System.dll</HintPath>
-      </Reference>
-      <Reference Include="UnityEngine">
-        <HintPath>Z:\Steam Launcher\steamapps\common\Phantom Brigade\PhantomBrigade_Data\Managed\UnityEngine.dll</HintPath>
-      </Reference>
-      <Reference Include="UnityEngine.CoreModule">
-        <HintPath>Z:\Steam Launcher\steamapps\common\Phantom Brigade\PhantomBrigade_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-      </Reference>
+        <Reference Include="0Harmony">
+            <HintPath>0Harmony.dll</HintPath>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>Assembly-CSharp.dll</HintPath>
+        </Reference>
+        <Reference Include="Entitas">
+            <HintPath>Entitas.dll</HintPath>
+        </Reference>
+        <Reference Include="System"/>
+        <Reference Include="System.Core"/>
+        <Reference Include="System.Data"/>
+        <Reference Include="System.Xml"/>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityUtilities">
+            <HintPath>UnityUtilities.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
       <Content Include="Functions\OnConsumableUse_heal_README_IT.md" />
       <Content Include="Functions\OnConsumableUse_heal_README.md" />
       <Content Include="LICENSE.md" />
       <Content Include="README.md" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="Functions\OnConsumableUse.cs" />
+        <Compile Include="PcmModLink.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs"/>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
