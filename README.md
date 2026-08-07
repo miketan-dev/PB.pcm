@@ -13,7 +13,7 @@
 | **Repository**           | [PB.pcm](https://github.com/miketan-dev/PB.pcm) |
 | **Programming Language** | C# 7.3 (.NET Framework v4.7.2)                  |
 | **Minimum Game Version** | v2.0+                                           |
-| **License**              | BSD 3-Clause License                            |
+| **License**              | BSD-3 Clause License                            |
 
 ---
 
@@ -58,8 +58,7 @@ To install the mod:
 
 ## Mod Intro
 
-**Pilot Consumable Mod (P.C.M.)** is a library and functional mod for *Phantom Brigade* that introduces a system for pilots to use consumable items during combat. 
-
+**Pilot Consumable Mod (P.C.M.)** is a library and functional mod for *Phantom Brigade* that introduces a system for pilots to use consumable items during combat.<br>
 This mod extends the game's mechanics, allowing for new tactical possibilities such as repairing or enhancing units on the battlefield through equipped consumable items.
 
 ## Key Features
@@ -71,22 +70,35 @@ This mod extends the game's mechanics, allowing for new tactical possibilities s
 
 ## Mod Mechanics
 
-When a combat action assigned to a consumable item is triggered:
+When a combat action assigned to a consumable item is triggered (via `OnConsumableUseCombat`):
 
-1. **Identification:** The system identifies the pilot and the consumable item being used.
-2. **Data Retrieval:** It accesses the item's blueprint to retrieve custom parameters defined in the `custom` block of the YAML configuration.
-3. **Calculation:** The mod calculates the healing effect based on the following formula:
-   `Final Heal = (healing * healing_efficiency)`
-4. **Safety Limits:** It ensures the healing does not exceed the unit's maximum health by applying `Mathf.Min(healAmount, missingHealth)`.
-5. **Execution:** The healing is applied to the pilot, and if the item's charges are exhausted, the item is destroyed.
+1. **Unit & Pilot Identification:** The mod resolves the `CombatEntity` to its linked `PersistentEntity` and subsequently to the `Pilot` entity to retrieve current stats.
+2. **Item Resolution:** It locates the `EquipmentEntity` associated with the active equipment part used in the combat action.
+3. **Blueprint Retrieval (`SubsystemHelper`):**
+    - The mod queries the `SubsystemHelper` to find the relevant `DataContainerSubsystem` blueprint.
+    - It searches for subsystems matching specific keys:
+        - `healing_efficiency` (`ConsumableKeys.HealingEfficiencyKey`)
+        - `healing` (`ConsumableKeys.HealingKey`)
+        - Or containing the fragment `consumable_heal` (`ConsumableKeys.HealConsumableKeyFragment`).
+4. **Healing Calculation:**
+    - The healing amount is derived from the blueprint: `totalHeal = healing * healing_efficiency`.
+    - It respects the pilot's maximum HP by capping the heal: `finalHeal = Mathf.Min(totalHeal, availableSpace)`.
+    - The pilot's HP stat is updated using `PilotUtility.OffsetPilotStat`.
+5. **Consumption & Cleanup:**
+    - The mod checks the item's `chargeCount`.
+    - If charges reach 1, it uses reflection to call the internal `DestroySocket` method on `CIViewInternalCombatUnit` to destroy the consumable socket (defaulting to "back"), which also involves the visual item.
+
 
 ## YAML Configuration
 
-To make an item consumable and functional with this mod, add the following structure to its YAML definition:
+To make an item consumable and functional with this mod, add the following structure to its YAML definition within the `custom` block of your equipment blueprint:
 
 ```yaml
 custom:
   floats:
-    healing: 20            # Base healing amount
-    healing_efficiency: 0.5 # Healing coefficient (e.g., 20 * 0.5 = 10)
+    healing: 20            # Defined by ConsumableKeys.HealingKey
+    healing_efficiency: 0.5 # Defined by ConsumableKeys.HealingEfficiencyKey
 ```
+
+Alternatively, ensuring your subsystem key contains `consumable_heal` (`ConsumableKeys.HealConsumableKeyFragment`) will also trigger the logic.
+
