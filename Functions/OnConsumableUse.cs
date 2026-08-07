@@ -38,7 +38,7 @@ namespace PB.pcm.Functions
             if (action != null && !action.isDisposed && action.hasActiveEquipmentPart)
             {
                 consumablePart = IDUtility.GetEquipmentEntity(action.activeEquipmentPart.equipmentID);
-                Debug.Log($"[PCM] - Consumabile trovato: {consumablePart}");
+                // Debug.Log($"[PCM] - Consumabile trovato: {consumablePart}");
             }
 
             if (consumablePart == null)
@@ -50,15 +50,14 @@ namespace PB.pcm.Functions
             var consumableBlueprint = SubsystemHelper.GetConsumableSubsystemBlueprint(consumablePart);
             if (consumableBlueprint == null)
             {
-                Debug.Log(
-                    $"[PCM] - Subsystem blueprint consumabile non trovato per la parte: {consumablePart}");
+                Debug.Log($"[PCM] - Subsystem blueprint consumabile non trovato per la parte: {consumablePart}");
                 return;
             }
 
-            var charge = DataHelperStats.GetCachedStatForPart("act_charges", consumablePart);
+            var charge = consumablePart.chargeCount.i;
 
-            consumableBlueprint.TryGetFloat(SubsystemKeys.HealingEfficiencyKey, out var efficiency);
-            consumableBlueprint.TryGetFloat(SubsystemKeys.HealingKey, out var healing);
+            consumableBlueprint.TryGetFloat(ConsumableKeys.HealingEfficiencyKey, out var efficiency);
+            consumableBlueprint.TryGetFloat(ConsumableKeys.HealingKey, out var healing);
 
             var currentHp = pilot.GetPilotStat("hp");
             var maxHp = pilot.GetPilotStatMax("hp");
@@ -69,23 +68,28 @@ namespace PB.pcm.Functions
                 var totalHeal = healing * efficiency;
                 var finalHeal = Mathf.Min(totalHeal, availableSpace);
 
-                PilotUtility.OffsetPilotStat(pilot, "hp", finalHeal, false);
-                Debug.Log($"[PCM] - HP: {healing} - Curato con successo di: {totalHeal}");
+                PilotUtility.OffsetPilotStat(pilot, "hp", finalHeal);
+                // Debug.Log($"[PCM] - HP: {healing} - Curato con successo di: {totalHeal}");
             }
 
-            consumablePart.isDestroyed = false;
-            if (charge <= 0f && !consumablePart.isDestroyed || !consumablePart.isWrecked)
+
+            // Per qualche strana ragione il valore minimo di charge è 1 anziché a 0.
+            switch (charge)
             {
-                // TODO: il consumabile sembra non distruggersi come un braccio o altro; forzare il bool a true.
-                consumablePart.isDestroyed = true;
-                Debug.Log($"[PCM] - Consumabile {consumablePart} - Distrutto");
-            }
-            else
-            {
-                Debug.Log($"[PCM] - Consumabile {consumablePart} - Non ancora distrutto.");
+                case 1:
+                    // Specificare altro nome se si vuole cambiare il socket target.
+                    // Molto utile se si vuole implementare su socket custom.
+                    SubsystemHelper.DestroyConsumableSocket("back");
+                    
+                    // Debug.Log($"[PCM] - Consumabile {consumablePart.nameInternal.s} - Distrutto");
+                    break;
+                default:
+                    Debug.Log(
+                        $"[PCM] - Consumabile {consumablePart.nameInternal.s} - Non ancora distrutto. | act_charges: {charge}");
+                    break;
             }
 
-            Debug.Log($"[PCM] - Cura effettuata con successo.");
+            Debug.Log("[PCM] - Cura effettuata con successo.");
         }
     }
 }

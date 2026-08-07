@@ -1,14 +1,21 @@
-﻿using PB.pcm.Constants;
+﻿using System.Reflection;
+using PB.pcm.Constants;
 using PhantomBrigade;
 using PhantomBrigade.Data;
+using UnityEngine;
 
 namespace PB.pcm.Helpers
 {
     internal static class SubsystemHelper
     {
-        public static DataContainerSubsystem GetConsumableSubsystemBlueprint(EquipmentEntity part)
+        internal static DataContainerSubsystem GetConsumableSubsystemBlueprint(EquipmentEntity part)
         {
             if (part == null)
+            {
+                return null;
+            }
+
+            if (!part.hasLevel)
             {
                 return null;
             }
@@ -38,8 +45,9 @@ namespace PB.pcm.Helpers
                     continue;
                 }
 
-                if (subsystemBlueprint.TryGetFloat(SubsystemKeys.HealingEfficiencyKey, out _, 1f) ||
-                    subsystemBlueprint.TryGetFloat(SubsystemKeys.HealingKey, out _, 1f))
+                // HEALING CONSUMABLE
+                if (subsystemBlueprint.TryGetFloat(ConsumableKeys.HealingEfficiencyKey, out _, 1f) ||
+                    subsystemBlueprint.TryGetFloat(ConsumableKeys.HealingKey, out _, 1f))
                 {
                     return subsystemBlueprint;
                 }
@@ -47,8 +55,9 @@ namespace PB.pcm.Helpers
 
             foreach (var subsystemBlueprint in subsystemBlueprints)
             {
+                // HEALING CONSUMABLE
                 if (subsystemBlueprint?.key != null &&
-                    subsystemBlueprint.key.Contains(SubsystemKeys.HealConsumableKeyFragment))
+                    subsystemBlueprint.key.Contains(ConsumableKeys.HealConsumableKeyFragment))
                 {
                     return subsystemBlueprint;
                 }
@@ -71,6 +80,29 @@ namespace PB.pcm.Helpers
             }
 
             return subsystem.dataLinkSubsystem.data;
+        }
+
+        // Metodo per distruggere un socket consumabile.
+        // Essendo il metodo originale privato accedo tramite Reflection.
+        internal static void DestroyConsumableSocket(string consumableSocket)
+        {
+            CIViewInternalCombatUnit ist = new CIViewInternalCombatUnit();
+
+            var methodInfo = typeof(CIViewInternalCombatUnit)
+                .GetMethod("DestroySocket", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            if (methodInfo == null)
+            {
+                Debug.Log("[PCM] - Metodo non trovato!");
+                return;
+            }
+
+            object[] parameters = { consumableSocket };
+
+            var result = (string)methodInfo.Invoke(ist, parameters);
+
+            Debug.Log($"[PCM] - Metodo trovato: {methodInfo.Name}");
+            Debug.Log($"[PCM] - Risultato: {result}");
         }
     }
 }
