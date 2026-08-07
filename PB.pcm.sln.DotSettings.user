@@ -11,5 +11,5 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003APersistentEntity_002Ecs_002Fl_003AC_0021_003FUsers_003Fpaolu_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F9a5ea077a552423fbe82fb8cd6f519e36fc600_003Fe9_003F71a530d8_003FPersistentEntity_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003APilotUtility_002Ecs_002Fl_003AC_0021_003FUsers_003Fpaolu_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E2_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F9a5ea077a552423fbe82fb8cd6f519e36fc600_003Fd4_003F69ac873d_003FPilotUtility_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
-  &lt;Assembly Path="Z:\Steam Launcher\steamapps\common\Phantom Brigade\PhantomBrigade_Data\Managed\Assembly-CSharp.dll" /&gt;&#xD;
+  &lt;Assembly Path="Z:\SteamLibrary\steamapps\common\Phantom Brigade\PhantomBrigade_Data\Managed\Assembly-CSharp.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String></wpf:ResourceDictionary>
