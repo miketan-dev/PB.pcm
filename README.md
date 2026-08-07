@@ -19,7 +19,7 @@
 
 ## CREDITS
 
-- Harmony Framework for the patching,
+- Harmony Framework for the patching;
 - Phantom Brigade Modding System;
 - Brace Yourself Games for the awesome game!
 
@@ -48,11 +48,12 @@ To install the mod:
 > applying the mod to avoid any unintended (and negative) effects.
 > <br><br>I will not be held responsible for any misuse of this mod or any damage caused to
 > save files.
-> <br>The above code project is made public to adhere
-> to [Brace Yourself Games' guidelines](https://braceyourselfgames.com/mod-policy/)
-> mostly to certify the present Library Code **DOES NOT CONTAIN** any malware and/or trojan in every form, stating that the mod does not perform any file/folder creation outside mod's directory.
-> <br><br>You are free to use my mod as a dependency to other mods as long as you give
-> credit to me, as this mod is also covered under **BSD-3 License**.
+> <br>The present project repository is made public to adhere
+> to [Brace Yourself Games' guidelines](https://braceyourselfgames.com/mod-policy/).<br>
+> The mod author certifies that the present Library Code **DOES NOT CONTAIN/EXECUTE** any kind of malware, stating that the mod does not perform any file/folder creation, if any, outside mod's directory.
+> <br><br>You are free to use my mod as a dependency for your mod(s) as long as you give
+> credits to me.
+> <br>The present project is under **BSD-3 License**, available [here](https://github.com/miketan-dev/PB.pcm/blob/master/LICENSE.md).
 
 ---
 
@@ -63,10 +64,10 @@ This mod extends the game's mechanics, allowing for new tactical possibilities s
 
 ## Key Features
 
-* **Consumable Usage:** Enables the use of specific consumable items during combat actions.
-* **Healing System:** Integrated logic to allow items to healing the pilot during combat.
+* **Consumable Usage:** Enables the use of a unique item called ***consumable items*** in combat.
+* **Healing System (Healing consumables only):** Integrated logic to allow items to heal the pilot in combat.
 * **Customizable:** Fully configurable through YAML, allowing modders to define base healing values and efficiency coefficients per item.
-* **Smart Resource Management:** Automatically consumes charges and destroys the item once all charges are depleted.
+* **Smart Resource Management:** Automatically consumes charges and destroys the item once all charges are depleted. Unlike standard charges (used by Backpacks in vanilla game), the depletion of charges will make the consumable item permanently lost.
 
 ## Mod Mechanics
 
@@ -80,7 +81,7 @@ When a combat action assigned to a consumable item is triggered (via `OnConsumab
         - `healing_efficiency` (`ConsumableKeys.HealingEfficiencyKey`)
         - `healing` (`ConsumableKeys.HealingKey`)
         - Or containing the fragment `consumable_heal` (`ConsumableKeys.HealConsumableKeyFragment`).
-4. **Healing Calculation:**
+4. **Healing Calculation (Healing consumables only):**
     - The healing amount is derived from the blueprint: `totalHeal = healing * healing_efficiency`.
     - It respects the pilot's maximum HP by capping the heal: `finalHeal = Mathf.Min(totalHeal, availableSpace)`.
     - The pilot's HP stat is updated using `PilotUtility.OffsetPilotStat`.
@@ -91,8 +92,9 @@ When a combat action assigned to a consumable item is triggered (via `OnConsumab
 
 ## YAML Configuration
 
-To make an item consumable and functional with this mod, add the following structure to its YAML definition within the `custom` block of your equipment blueprint:
+To make an item consumable and functional with this mod, add the following structure to its YAML definition within the `custom:` block of your Subsystem config file.
 
+***The following block is an example for healing consumables:***
 ```yaml
 custom:
   floats:
@@ -100,5 +102,6 @@ custom:
     healing_efficiency: 0.5 # Defined by ConsumableKeys.HealingEfficiencyKey
 ```
 
-Alternatively, ensuring your subsystem key contains `consumable_heal` (`ConsumableKeys.HealConsumableKeyFragment`) will also trigger the logic.
+Alternatively, ensuring your subsystem key contains `consumable_heal:` (`ConsumableKeys.HealConsumableKeyFragment`) will also trigger the logic.
+<br>This mod works best with items using charge stat `act_charges:` in the subsystem, commonly used in backpack subsystems.
 
